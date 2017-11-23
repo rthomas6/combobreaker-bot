@@ -3,7 +3,8 @@ import json
 import pprint
 import time
 
-sub_list = ['pics', 'askreddit', 'funny', 'reactiongifs', 'showerthoughts', 'gaming', 'gifs']
+#sub_list = ['pics', 'askreddit', 'funny', 'reactiongifs', 'showerthoughts', 'gaming', 'gifs']
+sub_list = ['all']
 
 
 def count_words(text):
@@ -11,18 +12,16 @@ def count_words(text):
 
 def is_comboable(comment):
     #3 words or less
-    if count_words(comment.body) > 3:
+    if count_words(comment.body) > 4:
         return False
     #No links
     if 'http' in comment.body:
         return False
     #No more than 16 hours old
-    #if (time.time() - float(comment.created)) > (16 * 60 * 60):
-    #    #print('Too old found: {} secs old'.format(time.time() - float(comment.created)))
-    #    #print('https://www.reddit.com' + comment.permalink + '?context=3')
-    #    return False
+    if (time.time() - float(comment.created)) > (6 * 60 * 60):
+        return False
     #Has enough upvotes
-    if int(comment.score) < 5:
+    if int(comment.score) < 2:
         #print('Not enough votes: {} votes'.format(comment.score))
         return False
     return True
@@ -55,7 +54,5 @@ reddit = praw.Reddit(client_id  = auth['client_id'],
 
 for sub in sub_list:
     subreddit = reddit.subreddit(sub)
-    for submission in subreddit.hot(limit=150):
-        #pprint.pprint(vars(submission))
-        if(time.time() - float(submission.created) < (6 * 60 * 60)):
-            scan_comments(submission)
+    for submission in subreddit.hot(limit=400):
+        scan_comments(submission)
